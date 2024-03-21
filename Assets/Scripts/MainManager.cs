@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Managers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    public Text BestScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -22,6 +24,16 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (string.IsNullOrEmpty(GameManager.Instance.saveData.UserName))
+        {
+            BestScoreText.text = "No Highscore yet!";
+        }
+        else
+        {
+            BestScoreText.text = $"Best Score : {GameManager.Instance.saveData.UserName} : {GameManager.Instance.saveData.HighScore}";
+        }
+        
+        
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -72,5 +84,12 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (m_Points > GameManager.Instance.saveData.HighScore)
+        {
+            GameManager.Instance.saveData.HighScore = m_Points;
+            GameManager.Instance.saveData.UserName = GameManager.Instance.playingUser;
+            GameManager.Instance.Save();
+        }
     }
 }
